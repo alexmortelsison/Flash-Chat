@@ -44,7 +44,8 @@ class _ChatScreenState extends State<ChatScreen> {
   // }
 
   void messagesStream() async {
-    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+    await for (var snapshot
+        in _firestore.collection('messages').orderBy('timestamp').snapshots()) {
       for (var message in snapshot.docs) {
         print(message.data());
       }
@@ -93,6 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       _firestore.collection('messages').add({
                         'text': messageText,
                         'sender': loggedInUser.email,
+                        'timestamp': FieldValue.serverTimestamp(),
                       });
                     },
                     child: const Text(
