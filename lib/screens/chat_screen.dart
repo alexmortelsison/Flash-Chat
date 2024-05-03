@@ -36,13 +36,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // void getMessages() async {
-  //   final messages = await _firestore.collection('messages').get();
-  //   for (var message in messages.docs) {
-  //     print(message.data());
-  //   }
-  // }
-
   void messagesStream() async {
     await for (var snapshot
         in _firestore.collection('messages').orderBy('timestamp').snapshots()) {
@@ -118,14 +111,20 @@ class MessagesStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('messages').snapshots(),
+      stream: _firestore
+          .collection('messages')
+          .orderBy(
+            'timestamp',
+            descending: false,
+          )
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        final messages = snapshot.data!.docs.reversed;
+        final messages = snapshot.data!.docs;
         List<MessageBubble> messageBubbles = [];
         for (var message in messages) {
           final messageText = message.get('text');
@@ -141,7 +140,7 @@ class MessagesStream extends StatelessWidget {
 
         return Expanded(
           child: ListView(
-            reverse: true,
+            // reverse: true,
             padding: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 20,
